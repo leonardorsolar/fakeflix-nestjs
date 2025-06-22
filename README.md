@@ -1,6 +1,75 @@
-#NestJS
+## 📘 Projeto: API com Frontend e Backend em NestJS
 
-Para criar um projeto NestJS no VS Code, siga os passos abaixo. O NestJS é um framework moderno para Node.js que utiliza TypeScript e é bastante usado para criar APIs robustas e escaláveis.
+Este projeto tem como objetivo demonstrar a criação de uma aplicação completa utilizando o **NestJS**, um framework progressivo para Node.js. Ele combina a robustez de um backend estruturado com TypeScript e a simplicidade de um frontend em HTML, CSS e JavaScript puro.
+
+A proposta é desenvolver uma **API RESTful** com NestJS e integrar com um **frontend estático**, possibilitando a realização de operações básicas de **cadastro, listagem, atualização e remoção de usuários**.
+
+---
+
+### 🧰 Tecnologias utilizadas
+
+- **NestJS** (backend)
+- **SQLite** (banco de dados local simples, sem ORM)
+- **HTML/CSS/JavaScript** (frontend estático)
+- **Node.js** e **npm**
+
+---
+
+### 📌 Funcionalidades
+
+- Criar usuários via formulário (POST)
+- Listar usuários em tempo real (GET)
+- Atualizar e excluir registros via API
+- Servir páginas HTML diretamente do servidor NestJS
+
+---
+
+### 🚀 Objetivo Educacional
+
+Este projeto serve como base para aprender conceitos fundamentais como:
+
+- Arquitetura modular com NestJS
+- Integração de frontend simples com API
+- Persistência de dados com SQLite (sem ORM)
+- Injeção de dependência e modularização
+- Uso de DTOs para organização de dados
+
+---
+
+Perfeito! Abaixo está o trecho que você pode **incluir no seu `README.md`** para orientar a pessoa a **baixar o projeto via GitHub** e executar localmente:
+
+---
+
+### 📥 Clonando o projeto via GitHub
+
+Para baixar e executar este projeto em sua máquina local:
+
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/seu-repositorio.git
+
+# Acesse a pasta do projeto
+cd seu-repositorio
+
+# Instale as dependências
+npm install
+
+# Inicie o projeto em modo de desenvolvimento
+npm run start:dev
+```
+
+> 🔁 Substitua `seu-usuario/seu-repositorio` pela URL real do seu repositório no GitHub.
+
+---
+
+### 🌐 Acessando o projeto
+
+- Acesse o frontend: [http://localhost:3000/index.html](http://localhost:3000/index.html)
+- API disponível em: [http://localhost:3000/user](http://localhost:3000/user)
+
+---
+
+# Tutorial passo a passo doProjeto: API com Frontend e Backend em NestJS
 
 ---
 
