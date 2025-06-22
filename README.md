@@ -1035,123 +1035,6 @@ Se você usar `@nestjs/swagger`, o Nest consegue **gerar documentação Swagger 
 
 Próximo passo: ativar a **validação automática com `class-validator`** no Nest, para que o DTO funcione na prática.
 
-# Prettier e ESLint
-
-Você está usando duas ferramentas essenciais para manter a qualidade e o estilo do código em projetos TypeScript/NestJS:
-
-- `Prettier` → formata automaticamente o código.
-- `ESLint` → analisa o código em busca de **erros e más práticas**.
-
-Vamos entender **cada um dos arquivos** que você mostrou:
-
----
-
-## 📄 `.prettierrc`
-
-Esse arquivo configura o **Prettier**, que serve apenas para **formatar o código automaticamente** (não faz verificação de erros).
-
-```json
-{
-  "singleQuote": true,
-  "trailingComma": "all"
-}
-```
-
-### O que essas opções significam?
-
-| Chave                    | Significado                                                                |
-| ------------------------ | -------------------------------------------------------------------------- |
-| `"singleQuote": true`    | Usa aspas simples (`'`) em vez de aspas duplas (`"`)                       |
-| `"trailingComma": "all"` | Adiciona vírgula no final de listas, objetos, etc. — mesmo na última linha |
-
-**Exemplo de código formatado com essas regras:**
-
-```ts
-const user = {
-  name: 'Leonardo',
-  email: 'leo@email.com',
-};
-```
-
----
-
-## 📄 `eslint.config.mjs`
-
-Esse arquivo configura o **ESLint**, que é responsável por:
-
-- Verificar erros de sintaxe
-- Aplicar boas práticas
-- Integrar com o TypeScript
-- (Com o plugin) forçar a formatação do Prettier
-
----
-
-### 📌 Trechos importantes explicados
-
-#### ✅ Ativa o modo TypeScript com tipagem completa:
-
-```ts
-import tseslint from 'typescript-eslint';
-...
-...tseslint.configs.recommendedTypeChecked
-```
-
-Isso permite ao ESLint **analisar seu código com o mesmo entendimento do TypeScript**, incluindo checagem de tipos.
-
----
-
-#### ✅ Integração com Prettier:
-
-```ts
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-```
-
-- Faz o ESLint também aplicar as regras do Prettier.
-- Assim, você vê **avisos de formatação no terminal/VS Code** (não só no salvar).
-
----
-
-#### ✅ Define variáveis globais válidas:
-
-```ts
-globals: {
-  ...globals.node,
-  ...globals.jest,
-}
-```
-
-- Informa ao ESLint que você usa:
-
-  - Node.js
-  - Jest (testes)
-
----
-
-#### ✅ Regras personalizadas:
-
-```ts
-rules: {
-  '@typescript-eslint/no-explicit-any': 'off',
-  '@typescript-eslint/no-floating-promises': 'warn',
-  '@typescript-eslint/no-unsafe-argument': 'warn',
-}
-```
-
-| Regra                        | Explicação                                     |
-| ---------------------------- | ---------------------------------------------- |
-| `no-explicit-any: off`       | Permite o uso do tipo `any`                    |
-| `no-floating-promises: warn` | Avisa se você esquecer de `await` em `Promise` |
-| `no-unsafe-argument: warn`   | Avisa se um argumento pode causar erro de tipo |
-
----
-
-## ✅ Em resumo
-
-| Arquivo             | Serve para...                         | Impacto no código                                          |
-| ------------------- | ------------------------------------- | ---------------------------------------------------------- |
-| `.prettierrc`       | Formatar código                       | Aspas simples, vírgulas finais, etc.                       |
-| `eslint.config.mjs` | Analisar erros, boas práticas e tipos | Detecta problemas e impõe padrão com TypeScript e Prettier |
-
 # Banco de dados:
 
 # Savar os dados no banco de dados no banco Sqlite sem uma orm
@@ -1396,7 +1279,350 @@ curl http://localhost:3000/user
 
 ---
 
-Primos passos: fazer testes de integração com essa estrutura, ou como aplicar validações nos DTOs.
+Próximos passos: fazer testes de integração com essa estrutura, ou como aplicar validações nos DTOs.
+
+# Front-end
+
+Você já tem a API funcionando com SQLite no NestJS. Agora vamos criar um **frontend simples** com HTML, CSS e JavaScript para:
+
+1. **Página principal** (`index.html`)
+2. **Formulário para cadastrar usuários** (`create.html`)
+3. **Página para listar usuários** (`list.html`)
+
+E vamos servir tudo isso como **páginas estáticas** no próprio NestJS.
+
+---
+
+## 📁 Estrutura final
+
+```
+project-root/
+├─ public/
+│  ├─ index.html
+│  ├─ create.html
+│  ├─ list.html
+│  ├─ style.css
+│  └─ script.js
+├─ src/
+│  └─ ...
+```
+
+---
+
+## ✅ 1. Crie a pasta `public` na raiz
+
+```bash
+mkdir public
+touch public/index.html public/create.html public/list.html public/style.css public/script.js
+```
+
+---
+
+## ✅ 2. Configure NestJS para servir arquivos estáticos
+
+Edite seu `main.ts`:
+
+```ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { join } from 'path';
+import * as express from 'express';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Serve arquivos HTML/CSS/JS da pasta public/
+  app.use(express.static(join(__dirname, '..', 'public')));
+
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+---
+
+## ✅ 3. `public/index.html`: Página inicial
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home - Usuários</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Bem-vindo ao sistema de usuários</h1>
+    <a href="/create.html">Cadastrar novo usuário</a><br />
+    <a href="/list.html">Listar usuários</a>
+  </body>
+</html>
+```
+
+---
+
+## ✅ 4. `public/create.html`: Formulário para cadastrar usuário
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cadastrar Usuário</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Cadastrar Usuário</h1>
+    <form id="userForm">
+      <label>Nome: <input type="text" name="name" required /></label><br />
+      <label>Email: <input type="email" name="email" required /></label><br />
+      <button type="submit">Salvar</button>
+    </form>
+    <p id="mensagem"></p>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+```
+
+---
+
+## ✅ 5. `public/list.html`: Listagem de usuários
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lista de Usuários</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Usuários Cadastrados</h1>
+    <ul id="userList"></ul>
+
+    <script>
+      fetch('/user')
+        .then((res) => res.json())
+        .then((data) => {
+          const list = document.getElementById('userList');
+          list.innerHTML = '';
+          data.forEach((user) => {
+            const item = document.createElement('li');
+            item.textContent = `${user.name} (${user.email})`;
+            list.appendChild(item);
+          });
+        });
+    </script>
+  </body>
+</html>
+```
+
+---
+
+## ✅ 6. `public/script.js`: JS do formulário
+
+```js
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('userForm');
+  const mensagem = document.getElementById('mensagem');
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const user = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+      };
+
+      try {
+        const res = await fetch('/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(user),
+        });
+
+        if (!res.ok) throw new Error('Erro ao cadastrar');
+
+        mensagem.textContent = 'Usuário cadastrado com sucesso!';
+        form.reset();
+      } catch (err) {
+        mensagem.textContent = 'Erro ao cadastrar usuário.';
+      }
+    });
+  }
+});
+```
+
+---
+
+## ✅ 7. `public/style.css`: Visual simples
+
+```css
+body {
+  font-family: sans-serif;
+  margin: 40px;
+  background: #f9f9f9;
+}
+h1 {
+  color: #333;
+}
+input {
+  margin: 5px 0;
+}
+button {
+  margin-top: 10px;
+}
+a {
+  display: block;
+  margin-top: 10px;
+  color: blue;
+}
+```
+
+### 2. Configure o NestJS para servir essa pasta
+
+No seu `main.ts`:
+
+```ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { join } from 'path';
+import * as express from 'express';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Servir arquivos estáticos da pasta public/
+  app.use(express.static(join(__dirname, '..', 'public')));
+  //app.use('/user', express.static(join(__dirname, '..', 'public/user')));
+
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+### 3. Acesse no navegador
+
+- [http://localhost:3000](http://localhost:3000) → Página inicial
+- [http://localhost:3000/create.html](http://localhost:3000/create.html) → Cadastrar usuário
+- [http://localhost:3000/list.html](http://localhost:3000/list.html) → Ver usuários
+
+## 📦 Dica: para modularizar o front
+
+Configure o NestJS para servir essa pasta:
+
+```ts
+app.use('/user', express.static(join(__dirname, '..', 'public/user')));
+```
+
+Acesse no navegador:
+http://localhost:3000/user
+
+> Ele vai mostrar o `index.html` da pasta `public/user`.
+
+---
+
+## 📦 Dica: para mais páginas
+
+Você pode adicionar outras rotas/pastas:
+
+```ts
+app.use('/admin', express.static(join(__dirname, '..', 'public/admin')));
+```
+
+---
+
+## ✅ Alternativas
+
+Se quiser páginas dinâmicas (HTML gerado no servidor com dados), você pode usar:
+
+- **Templates com EJS, Handlebars ou Pug** (`@nestjs/platform-express`)
+- Ou um **frontend separado** (como React, Angular ou Vue) consumindo a API NestJS
+
+---
+
+Próximos passos: servir páginas dinâmicas com dados usando EJS ou como integrar com React.
+
+---
+
+---
+
+## ✅ Conclusão
+
+Você criou:
+
+| Página        | Função                            |
+| ------------- | --------------------------------- |
+| `index.html`  | Link para cadastrar e listar      |
+| `create.html` | Formulário para POST em `/user`   |
+| `list.html`   | GET em `/user` e exibe lista      |
+| `script.js`   | JS que envia os dados via `fetch` |
+
+Próximos passos: adicionar **validações**, **edição de usuários**, ou **buscar usuário por ID** na interface. Deseja isso?
+
+# Conhecimento de ORM
+
+## 🧠 O que é um **banco de dados com e sem ORM**?
+
+### ✅ **Banco de dados com ORM (Object-Relational Mapping)**
+
+👉 Você **não escreve SQL** diretamente.
+👉 Em vez disso, você usa **objetos e classes** que representam tabelas e registros do banco.
+
+### Exemplo (com ORM):
+
+```ts
+const user = await userRepository.findOne({ where: { id: 1 } });
+```
+
+> Aqui você usa **métodos de um objeto**, não escreve `SELECT * FROM users`.
+
+#### Ferramentas ORM populares:
+
+- **TypeORM** (NestJS, Node.js)
+- **Prisma** (moderno e tipado)
+- **Hibernate** (Java)
+- **Entity Framework** (C#)
+
+---
+
+### 🚫 **Banco de dados sem ORM**
+
+👉 Você escreve **SQL puro** (manualmente).
+👉 Você tem mais controle, mas precisa lidar com **queries, conexões e erros** por conta própria.
+
+### Exemplo (sem ORM):
+
+```ts
+db.get('SELECT * FROM users WHERE id = ?', [1], (err, row) => {
+  console.log(row);
+});
+```
+
+> Aqui você escreve a SQL completa e trata o retorno manualmente.
+
+---
+
+## 🆚 Diferença simples:
+
+| Aspecto              | Com ORM                                   | Sem ORM                          |
+| -------------------- | ----------------------------------------- | -------------------------------- |
+| Linguagem            | Classe e métodos (`.find()`)              | SQL puro (`SELECT ...`)          |
+| Curva de aprendizado | Mais fácil para iniciantes                | Mais controle, mais complexidade |
+| Produtividade        | Alta (menos código manual)                | Média/baixa (mais código)        |
+| Performance          | Boa (com tuning), mas pode esconder o SQL | Máxima transparência             |
+| Erros                | Tratados por abstração                    | Você trata tudo                  |
+
+---
+
+## 🧪 Quando usar qual?
+
+- ✅ **Use ORM** se você quer **rapidez para desenvolver**, foco em regras de negócio e produtividade.
+- ✅ **Use sem ORM** se você quer **total controle**, simplicidade ou está em projeto pequeno.
+
+---
 
 # Banco de Dados com ORM:
 
@@ -1816,64 +2042,121 @@ curl http://localhost:3000/user
 
 Proximos passos: mostrar como adicionar validações com `class-validator` ou como gerar migrations com o Prisma. Deseja seguir com isso?
 
-# Conhecimento
+# Conhecimento Estilo de código:
 
-## 🧠 O que é um **banco de dados com e sem ORM**?
+# Prettier e ESLint
 
-### ✅ **Banco de dados com ORM (Object-Relational Mapping)**
+Você está usando duas ferramentas essenciais para manter a qualidade e o estilo do código em projetos TypeScript/NestJS:
 
-👉 Você **não escreve SQL** diretamente.
-👉 Em vez disso, você usa **objetos e classes** que representam tabelas e registros do banco.
+- `Prettier` → formata automaticamente o código.
+- `ESLint` → analisa o código em busca de **erros e más práticas**.
 
-### Exemplo (com ORM):
+Vamos entender **cada um dos arquivos** que você mostrou:
 
-```ts
-const user = await userRepository.findOne({ where: { id: 1 } });
+---
+
+## 📄 `.prettierrc`
+
+Esse arquivo configura o **Prettier**, que serve apenas para **formatar o código automaticamente** (não faz verificação de erros).
+
+```json
+{
+  "singleQuote": true,
+  "trailingComma": "all"
+}
 ```
 
-> Aqui você usa **métodos de um objeto**, não escreve `SELECT * FROM users`.
+### O que essas opções significam?
 
-#### Ferramentas ORM populares:
+| Chave                    | Significado                                                                |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `"singleQuote": true`    | Usa aspas simples (`'`) em vez de aspas duplas (`"`)                       |
+| `"trailingComma": "all"` | Adiciona vírgula no final de listas, objetos, etc. — mesmo na última linha |
 
-- **TypeORM** (NestJS, Node.js)
-- **Prisma** (moderno e tipado)
-- **Hibernate** (Java)
-- **Entity Framework** (C#)
-
----
-
-### 🚫 **Banco de dados sem ORM**
-
-👉 Você escreve **SQL puro** (manualmente).
-👉 Você tem mais controle, mas precisa lidar com **queries, conexões e erros** por conta própria.
-
-### Exemplo (sem ORM):
+**Exemplo de código formatado com essas regras:**
 
 ```ts
-db.get('SELECT * FROM users WHERE id = ?', [1], (err, row) => {
-  console.log(row);
-});
+const user = {
+  name: 'Leonardo',
+  email: 'leo@email.com',
+};
 ```
 
-> Aqui você escreve a SQL completa e trata o retorno manualmente.
+---
+
+## 📄 `eslint.config.mjs`
+
+Esse arquivo configura o **ESLint**, que é responsável por:
+
+- Verificar erros de sintaxe
+- Aplicar boas práticas
+- Integrar com o TypeScript
+- (Com o plugin) forçar a formatação do Prettier
 
 ---
 
-## 🆚 Diferença simples:
+### 📌 Trechos importantes explicados
 
-| Aspecto              | Com ORM                                   | Sem ORM                          |
-| -------------------- | ----------------------------------------- | -------------------------------- |
-| Linguagem            | Classe e métodos (`.find()`)              | SQL puro (`SELECT ...`)          |
-| Curva de aprendizado | Mais fácil para iniciantes                | Mais controle, mais complexidade |
-| Produtividade        | Alta (menos código manual)                | Média/baixa (mais código)        |
-| Performance          | Boa (com tuning), mas pode esconder o SQL | Máxima transparência             |
-| Erros                | Tratados por abstração                    | Você trata tudo                  |
+#### ✅ Ativa o modo TypeScript com tipagem completa:
+
+```ts
+import tseslint from 'typescript-eslint';
+...
+...tseslint.configs.recommendedTypeChecked
+```
+
+Isso permite ao ESLint **analisar seu código com o mesmo entendimento do TypeScript**, incluindo checagem de tipos.
+
+---
+
+#### ✅ Integração com Prettier:
+
+```ts
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+```
+
+- Faz o ESLint também aplicar as regras do Prettier.
+- Assim, você vê **avisos de formatação no terminal/VS Code** (não só no salvar).
 
 ---
 
-## 🧪 Quando usar qual?
+#### ✅ Define variáveis globais válidas:
 
-- ✅ **Use ORM** se você quer **rapidez para desenvolver**, foco em regras de negócio e produtividade.
-- ✅ **Use sem ORM** se você quer **total controle**, simplicidade ou está em projeto pequeno.
+```ts
+globals: {
+  ...globals.node,
+  ...globals.jest,
+}
+```
+
+- Informa ao ESLint que você usa:
+
+  - Node.js
+  - Jest (testes)
 
 ---
+
+#### ✅ Regras personalizadas:
+
+```ts
+rules: {
+  '@typescript-eslint/no-explicit-any': 'off',
+  '@typescript-eslint/no-floating-promises': 'warn',
+  '@typescript-eslint/no-unsafe-argument': 'warn',
+}
+```
+
+| Regra                        | Explicação                                     |
+| ---------------------------- | ---------------------------------------------- |
+| `no-explicit-any: off`       | Permite o uso do tipo `any`                    |
+| `no-floating-promises: warn` | Avisa se você esquecer de `await` em `Promise` |
+| `no-unsafe-argument: warn`   | Avisa se um argumento pode causar erro de tipo |
+
+---
+
+## ✅ Em resumo
+
+| Arquivo             | Serve para...                         | Impacto no código                                          |
+| ------------------- | ------------------------------------- | ---------------------------------------------------------- |
+| `.prettierrc`       | Formatar código                       | Aspas simples, vírgulas finais, etc.                       |
+| `eslint.config.mjs` | Analisar erros, boas práticas e tipos | Detecta problemas e impõe padrão com TypeScript e Prettier |
