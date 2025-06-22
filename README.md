@@ -395,3 +395,328 @@ constructor(private readonly appService: AppService) {}
 ```
 
 ---
+
+# Teste com Jest
+
+## src/app.controller.spec.ts
+
+Esse código é um **teste automatizado** feito para o NestJS utilizando o **Jest**, que é o framework de testes padrão no Nest.
+
+---
+
+## 🧪 O que esse código faz?
+
+Ele **testa a funcionalidade do controller** `AppController`, verificando se o método `getHello()` está retornando corretamente a string `"Hello World!"`.
+
+---
+
+## 🧩 Explicando o código
+
+```ts
+import { Test, TestingModule } from '@nestjs/testing';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+```
+
+- Importa utilitários para testes do NestJS e as classes que serão testadas (`AppController`, `AppService`).
+
+---
+
+### 🔹 `describe('AppController', () => { ... })`
+
+- Define um **bloco de testes** para `AppController`.
+
+---
+
+### 🔹 `beforeEach(async () => { ... })`
+
+- Esse bloco roda **antes de cada teste**.
+- Cria um **módulo de teste isolado** (`TestingModule`), simulando a aplicação real:
+
+```ts
+const app: TestingModule = await Test.createTestingModule({
+  controllers: [AppController],
+  providers: [AppService],
+}).compile();
+```
+
+- Depois, pega a instância real do `AppController`:
+
+```ts
+appController = app.get<AppController>(AppController);
+```
+
+---
+
+### 🔹 `describe('root', ...)` e `it(...)`
+
+```ts
+it('should return "Hello World!"', () => {
+  expect(appController.getHello()).toBe('Hello World!');
+});
+```
+
+- Define um **caso de teste**.
+- Verifica se `appController.getHello()` retorna a string `"Hello World!"`.
+
+---
+
+## ▶️ Como rodar esse teste no NestJS?
+
+1. Certifique-se de que o projeto foi criado com o CLI (`nest new nome-do-projeto`) — ele já inclui o Jest.
+
+2. No terminal, execute:
+
+```bash
+npm run test
+```
+
+Ou, para ver em tempo real com recarregamento automático:
+
+```bash
+npm run test:watch
+```
+
+---
+
+## 📁 Onde salvar esse teste?
+
+Por convenção, o arquivo deve ser salvo como:
+
+```
+src/app.controller.spec.ts
+```
+
+Ou seja, o nome do arquivo termina com `.spec.ts` para indicar que é um **teste unitário**.
+
+---
+
+## ✅ Em resumo
+
+Esse código:
+
+- Cria um **teste unitário para o controller**
+- Simula o NestJS real (módulo, injeção de dependência)
+- Verifica se `getHello()` retorna `"Hello World!"`
+- Pode ser executado com `npm run test`
+
+---
+
+# teste E2E
+
+Excelente! Esse código é um **teste E2E (fim a fim)** no NestJS, salvo geralmente no arquivo `test/app.e2e-spec.ts`.
+
+Enquanto os testes unitários verificam pedaços isolados da aplicação (como um método), os testes **E2E simulam requisições reais HTTP** e testam **a aplicação como um todo**, como se fosse um usuário acessando a API.
+
+---
+
+## 📦 Código analisado
+
+```ts
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { App } from 'supertest/types';
+import { AppModule } from './../src/app.module';
+```
+
+### O que está sendo importado?
+
+- `Test`, `TestingModule`: Utilitários para criar um ambiente de testes.
+- `INestApplication`: Interface da aplicação Nest.
+- `request`: Função do **Supertest**, usada para fazer **requisições HTTP simuladas**.
+- `AppModule`: Módulo principal da aplicação Nest (importado da pasta `src/`).
+
+---
+
+## 🧩 Bloco de testes
+
+```ts
+describe('AppController (e2e)', () => {
+  let app: INestApplication<App>;
+```
+
+- Define um **bloco de testes** para `AppController`.
+- Cria uma variável `app` que será a aplicação Nest inicializada.
+
+---
+
+### 🔹 `beforeEach(...)`
+
+```ts
+beforeEach(async () => {
+  const moduleFixture: TestingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+
+  app = moduleFixture.createNestApplication();
+  await app.init();
+});
+```
+
+- Antes de cada teste, um módulo completo é criado com o `AppModule`.
+- A aplicação Nest é inicializada com `.createNestApplication()`.
+- `await app.init()` faz com que a aplicação esteja pronta para ser testada.
+
+---
+
+### 🔹 O teste em si
+
+```ts
+it('/ (GET)', () => {
+  return request(app.getHttpServer())
+    .get('/')
+    .expect(200)
+    .expect('Hello World!');
+});
+```
+
+- Faz uma **requisição GET para `/`** (rota raiz).
+- Verifica se o status é `200 OK` e o corpo da resposta é `"Hello World!"`.
+
+Esse teste simula o que acontece quando um **usuário real acessa a API**, testando a **integração entre controller, service e configuração do app**.
+
+---
+
+## ▶️ Como rodar o teste E2E?
+
+No terminal, execute:
+
+```bash
+npm run test:e2e
+```
+
+> Por padrão, esse comando procura por arquivos `*.e2e-spec.ts` na pasta `test/`.
+
+---
+
+## ✅ Em resumo
+
+Esse teste:
+
+| Característica           | Explicação                                                        |
+| ------------------------ | ----------------------------------------------------------------- |
+| Tipo                     | E2E (fim a fim)                                                   |
+| Ferramenta de requisição | `supertest`                                                       |
+| O que ele testa          | Se a API responde corretamente a uma requisição GET na raiz (`/`) |
+| Expectativa              | Status 200 + `"Hello World!"`                                     |
+| Como executar            | `npm run test:e2e`                                                |
+
+---
+
+# Prettier e ESLint
+
+Você está usando duas ferramentas essenciais para manter a qualidade e o estilo do código em projetos TypeScript/NestJS:
+
+- `Prettier` → formata automaticamente o código.
+- `ESLint` → analisa o código em busca de **erros e más práticas**.
+
+Vamos entender **cada um dos arquivos** que você mostrou:
+
+---
+
+## 📄 `.prettierrc`
+
+Esse arquivo configura o **Prettier**, que serve apenas para **formatar o código automaticamente** (não faz verificação de erros).
+
+```json
+{
+  "singleQuote": true,
+  "trailingComma": "all"
+}
+```
+
+### O que essas opções significam?
+
+| Chave                    | Significado                                                                |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `"singleQuote": true`    | Usa aspas simples (`'`) em vez de aspas duplas (`"`)                       |
+| `"trailingComma": "all"` | Adiciona vírgula no final de listas, objetos, etc. — mesmo na última linha |
+
+**Exemplo de código formatado com essas regras:**
+
+```ts
+const user = {
+  name: 'Leonardo',
+  email: 'leo@email.com',
+};
+```
+
+---
+
+## 📄 `eslint.config.mjs`
+
+Esse arquivo configura o **ESLint**, que é responsável por:
+
+- Verificar erros de sintaxe
+- Aplicar boas práticas
+- Integrar com o TypeScript
+- (Com o plugin) forçar a formatação do Prettier
+
+---
+
+### 📌 Trechos importantes explicados
+
+#### ✅ Ativa o modo TypeScript com tipagem completa:
+
+```ts
+import tseslint from 'typescript-eslint';
+...
+...tseslint.configs.recommendedTypeChecked
+```
+
+Isso permite ao ESLint **analisar seu código com o mesmo entendimento do TypeScript**, incluindo checagem de tipos.
+
+---
+
+#### ✅ Integração com Prettier:
+
+```ts
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+```
+
+- Faz o ESLint também aplicar as regras do Prettier.
+- Assim, você vê **avisos de formatação no terminal/VS Code** (não só no salvar).
+
+---
+
+#### ✅ Define variáveis globais válidas:
+
+```ts
+globals: {
+  ...globals.node,
+  ...globals.jest,
+}
+```
+
+- Informa ao ESLint que você usa:
+
+  - Node.js
+  - Jest (testes)
+
+---
+
+#### ✅ Regras personalizadas:
+
+```ts
+rules: {
+  '@typescript-eslint/no-explicit-any': 'off',
+  '@typescript-eslint/no-floating-promises': 'warn',
+  '@typescript-eslint/no-unsafe-argument': 'warn',
+}
+```
+
+| Regra                        | Explicação                                     |
+| ---------------------------- | ---------------------------------------------- |
+| `no-explicit-any: off`       | Permite o uso do tipo `any`                    |
+| `no-floating-promises: warn` | Avisa se você esquecer de `await` em `Promise` |
+| `no-unsafe-argument: warn`   | Avisa se um argumento pode causar erro de tipo |
+
+---
+
+## ✅ Em resumo
+
+| Arquivo             | Serve para...                         | Impacto no código                                          |
+| ------------------- | ------------------------------------- | ---------------------------------------------------------- |
+| `.prettierrc`       | Formatar código                       | Aspas simples, vírgulas finais, etc.                       |
+| `eslint.config.mjs` | Analisar erros, boas práticas e tipos | Detecta problemas e impõe padrão com TypeScript e Prettier |
