@@ -604,6 +604,437 @@ Esse teste:
 
 ---
 
+# Começando no Nestjs
+
+Ótimo! Vamos criar um **projeto NestJS básico** com uma rota `/user` que:
+
+- Aceita requisições `POST` com dados de um usuário (via `curl`)
+- Salva os usuários em memória (temporariamente)
+- Exibe todos os usuários com `GET /user`
+
+---
+
+# NestJS gerando uma estrutura completa de CRUD para o recurso user
+
+## ✅ Passo a passo para começar no NestJS
+
+## 👨‍💻 Criar a rota `/user`
+
+Vamos criar um **módulo, controller e service** para `User`:
+
+### 4. 📁 Gerar módulo e recursos
+
+Quando você roda: nest g resource user
+Você pedirá para o Nest gerar automaticamente a estrutura completa de um recurso (módulo, controller, service e DTOs).
+
+```bash
+nest g resource user
+```
+
+Responda:
+
+- **Which transport layer?** REST API
+- **Would you like to generate CRUD?** Yes
+- **Which type of provider?** Service
+
+Ele pergunta:
+Se é REST ou GraphQL
+Se você quer gerar os métodos CRUD automaticamente
+
+O comando nest g resource é ideal para criar recursos (como entidades do domínio, com controller e service)
+
+---
+
+## 🧠 Como funciona:
+
+O NestJS **liga tudo automaticamente** com base nos módulos:
+
+- Você chama uma rota HTTP → `Controller`
+- O controller usa o **Service** (via injeção de dependência)
+- O serviço faz a lógica e retorna a resposta
+- Tudo isso está **encapsulado no módulo `UserModule`**
+
+---
+
+## ✅ O que o Nest gerou para você
+
+| Arquivo                   | Função                                                  |
+| ------------------------- | ------------------------------------------------------- |
+| `user.module.ts`          | Define o módulo do usuário                              |
+| `user.controller.ts`      | Define as rotas HTTP (`/user`, `/user/:id`, etc.)       |
+| `user.service.ts`         | Lógica de negócio (ainda com mensagens de exemplo)      |
+| `dto/create-user.dto.ts`  | Define os dados esperados para criar um usuário         |
+| `dto/update-user.dto.ts`  | Define os dados para atualizar um usuário               |
+| `entities/user.entity.ts` | Define a "classe" do usuário (entidade para futuro uso) |
+
+---
+
+### 5. ✏️ Ajustar os arquivos
+
+## 🛠️ Vamos agora **fazer funcionar de verdade**
+
+### 1. 🚀 Altere o `src/user/entities/user.entity.ts` para criar o tipo do usuário
+
+```ts
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+```
+
+Obs.: Um outra opção usada para criar o usuário seria criar uma interface no user.service.ts:
+
+### 2. 🚀 Altere o `UserService` para armazenar usuários em memória
+
+Substitua o conteúdo de `user.service.ts` por:
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+
+@Injectable()
+export class UserService {
+  private users: User[] = [];
+  private idCounter = 1;
+
+  create(createUserDto: CreateUserDto) {
+    const user = {
+      id: this.idCounter++,
+      ...createUserDto,
+    };
+    this.users.push(user);
+    return user;
+  }
+
+  findAll() {
+    return this.users;
+  }
+
+  findOne(id: number) {
+    return this.users.find((user) => user.id === id);
+  }
+
+  update(id: number, updateUserDto: UpdateUserDto) {
+    const user = this.findOne(id);
+    if (!user) return null;
+
+    Object.assign(user, updateUserDto);
+    return user;
+  }
+
+  remove(id: number) {
+    const index = this.users.findIndex((user) => user.id === id);
+    if (index === -1) return null;
+
+    const removed = this.users.splice(index, 1);
+    return removed[0];
+  }
+}
+```
+
+---
+
+### 3. 🧾 Altere o DTO para aceitar nome e email
+
+#### `create-user.dto.ts`:
+
+```ts
+export class CreateUserDto {
+  name: string;
+  email: string;
+}
+```
+
+> O `UpdateUserDto` já herda esse tipo, então **não precisa mexer nele**.
+
+---
+
+### 4. ▶️ Rode a aplicação
+
+No terminal:
+
+```bash
+npm run start:dev
+```
+
+---
+
+> Isso inicia o servidor em `http://localhost:3000`
+
+---
+
+### 4. 🧪 Testar com `curl`
+
+#### ➕ Criar um usuário:
+
+```bash
+curl -X POST http://localhost:3000/user \
+  -H "Content-Type: application/json" \
+  -d '{"name": "João", "email": "joao@email.com"}'
+```
+
+#### 📄 Listar todos os usuários:
+
+```bash
+curl http://localhost:3000/user
+```
+
+#### 🔎 Buscar um usuário específico (ex: id 1):
+
+```bash
+curl http://localhost:3000/user/1
+```
+
+#### 📝 Atualizar um usuário:
+
+```bash
+curl -X PATCH http://localhost:3000/user/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "João da Silva"}'
+```
+
+#### ❌ Remover um usuário:
+
+```bash
+curl -X DELETE http://localhost:3000/user/1
+```
+
+---
+
+## ✅ Resultado esperado
+
+As respostas do servidor serão objetos JSON como:
+
+```json
+{
+  "id": 1,
+  "name": "João",
+  "email": "joao@email.com"
+}
+```
+
+---
+
+## 💡 Próximos passos (opcional)
+
+- Usar **validação com decorators** (`class-validator`)
+- adicionar validações nos campos (como `name` ser obrigatório e `email` válido)
+- Conectar com banco de dados usando **TypeORM** ou **Prisma**
+- Salvar os usuários em um banco como SQLite, PostgreSQL ou MongoDB
+- Adicionar autenticação (`@nestjs/passport`, JWT)
+- Testes unitários e E2E
+
+---
+
+# Conhecimentos no NestJs:
+
+# Entendendo a modularização automática do NestJs
+
+Sim! O NestJS **cria módulos automaticamente** quando você usa comandos como `nest g resource user`. Essa é uma das **grandes forças do NestJS**: ele **organiza o projeto por módulos**, que ajudam a **separar responsabilidades** e **manter o código escalável**.
+
+---
+
+## 🧱 O que é modularização no NestJS?
+
+O NestJS segue o princípio de **modularização**, onde **cada funcionalidade do sistema** (como `user`, `auth`, `product`, etc.) é organizada dentro de um **módulo isolado**.
+
+---
+
+### 🧩 Cada **módulo** geralmente contém:
+
+```
+src/user/
+├── user.module.ts        <- Módulo principal
+├── user.controller.ts    <- Rotas (HTTP)
+├── user.service.ts       <- Lógica de negócio
+├── dto/                  <- Validações e interfaces de entrada
+└── entities/             <- Entidades (se usar banco)
+```
+
+---
+
+### 🛠 Comando `nest g resource user`
+
+Quando você roda:
+
+```bash
+nest g resource user
+```
+
+Você está pedindo para o Nest **gerar automaticamente a estrutura completa** de um recurso (módulo, controller, service e DTOs).
+
+> Ele pergunta:
+>
+> - Se é REST ou GraphQL
+> - Se você quer gerar os métodos CRUD automaticamente
+
+---
+
+### 📦 Exemplo: `UserModule` gerado
+
+#### `user.module.ts`
+
+```ts
+import { Module } from '@nestjs/common';
+import { UserService } from './user.service';
+import { UserController } from './user.controller';
+
+@Module({
+  controllers: [UserController],
+  providers: [UserService],
+})
+export class UserModule {}
+```
+
+Esse arquivo **declara que o módulo `UserModule` tem**:
+
+- Um **controller** que trata as rotas HTTP (`UserController`)
+- Um **service** que trata a lógica de negócio (`UserService`)
+
+---
+
+## 🧠 Como funciona na prática?
+
+O NestJS **liga tudo automaticamente** com base nos módulos:
+
+- Você chama uma rota HTTP → `Controller`
+- O controller usa o **Service** (via injeção de dependência)
+- O serviço faz a lógica e retorna a resposta
+- Tudo isso está **encapsulado no módulo `UserModule`**
+
+---
+
+### 🧩 AppModule importa os módulos:
+
+No `app.module.ts`:
+
+```ts
+import { Module } from '@nestjs/common';
+import { UserModule } from './user/user.module';
+
+@Module({
+  imports: [UserModule],
+})
+export class AppModule {}
+```
+
+Ou seja, você **ativa o módulo** na aplicação principal.
+
+---
+
+## ✅ Vantagens da modularização:
+
+| Vantagem                       | Benefício prático                             |
+| ------------------------------ | --------------------------------------------- |
+| Separação de responsabilidades | Facilita manutenção e entendimento            |
+| Reutilização de código         | Um módulo pode ser importado em outro projeto |
+| Escalabilidade                 | Projetos grandes continuam organizados        |
+| Testabilidade                  | Módulos são independentes e fáceis de testar  |
+
+---
+
+Proximos passos: **dividir o projeto em múltiplos módulos interdependentes** (ex: `user`, `auth`, `roles`) e como **um módulo importa outro**.
+
+# DTOs:
+
+✅ Usar **DTOs (Data Transfer Objects)** é uma **boa prática essencial** no desenvolvimento com NestJS (e em outras arquiteturas modernas).
+
+---
+
+## 📌 O que é um DTO?
+
+DTO significa **Data Transfer Object** — **objeto de transferência de dados**.
+É uma **classe ou estrutura** usada para **receber e/ou enviar dados** entre o cliente (ex: `curl`, `Postman`) e a aplicação.
+
+---
+
+## 🎯 Por que usar DTOs?
+
+### 1. 🛡️ **Validação de dados**
+
+Com DTOs, você pode usar decorators como `@IsString()`, `@IsEmail()`, `@Length()`, etc., para **garantir que os dados recebidos estão corretos** antes de chegar no controller ou service.
+
+```ts
+import { IsEmail, IsString } from 'class-validator';
+
+export class CreateUserDto {
+  @IsString()
+  name: string;
+
+  @IsEmail()
+  email: string;
+}
+```
+
+➡️ Isso evita que dados inválidos cheguem à lógica do seu sistema (ex: `name: 123` ou `email: "banana"`).
+
+---
+
+### 2. ✨ **Clareza e organização**
+
+Usar DTOs deixa claro **o que cada rota espera como entrada** e **o que ela retorna**.
+É como a "assinatura" de uma rota: você vê rapidamente quais campos são obrigatórios.
+
+---
+
+### 3. 🔒 **Segurança**
+
+DTOs ajudam a **evitar que o usuário envie dados que não deveriam ser modificados**, como `id`, `createdAt`, `admin`, etc.
+
+Exemplo: se você usar `@Body() user: any`, alguém pode enviar:
+
+```json
+{
+  "name": "João",
+  "isAdmin": true
+}
+```
+
+➡️ E isso pode ser um problema!
+Com DTOs, você controla exatamente **quais campos são aceitos**.
+
+---
+
+### 4. 🔄 **Reutilização de código**
+
+DTOs podem ser reutilizados em vários lugares:
+
+- Controllers
+- Services
+- Testes
+- Documentação automática (Swagger, por exemplo)
+
+E o NestJS permite extender DTOs, como já vimos:
+
+```ts
+export class UpdateUserDto extends PartialType(CreateUserDto) {}
+```
+
+---
+
+### 5. 📚 **Documentação automática**
+
+Se você usar `@nestjs/swagger`, o Nest consegue **gerar documentação Swagger automática baseada nos DTOs**, sem precisar escrever manualmente.
+
+---
+
+## 🧠 Resumo: Por que usar DTOs?
+
+| Vantagem         | Explicação rápida                                   |
+| ---------------- | --------------------------------------------------- |
+| **Validação**    | Garante que os dados recebidos são válidos          |
+| **Organização**  | Facilita a leitura e manutenção                     |
+| **Segurança**    | Evita que dados não permitidos sejam enviados       |
+| **Reutilização** | Pode ser usado em várias partes da aplicação        |
+| **Documentação** | Ajuda a gerar Swagger e outros docs automaticamente |
+
+---
+
+Próximo passo: ativar a **validação automática com `class-validator`** no Nest, para que o DTO funcione na prática.
+
 # Prettier e ESLint
 
 Você está usando duas ferramentas essenciais para manter a qualidade e o estilo do código em projetos TypeScript/NestJS:
@@ -720,3 +1151,729 @@ rules: {
 | ------------------- | ------------------------------------- | ---------------------------------------------------------- |
 | `.prettierrc`       | Formatar código                       | Aspas simples, vírgulas finais, etc.                       |
 | `eslint.config.mjs` | Analisar erros, boas práticas e tipos | Detecta problemas e impõe padrão com TypeScript e Prettier |
+
+# Banco de dados:
+
+# Savar os dados no banco de dados no banco Sqlite sem uma orm
+
+Vamos fazer uma versão simples usando **SQLite direto**, sem ORM, só com o pacote `sqlite3` e usando queries SQL manuais no NestJS.
+
+---
+
+## Passo a passo para salvar usuários em SQLite
+
+---
+
+### 1. Instale o pacote SQLite
+
+```bash
+npm install sqlite3
+npm install @types/sqlite3 --save-dev
+```
+
+---
+
+## O que é um **provider** no NestJS?
+
+Um **provider** é qualquer classe ou valor que você registra no sistema de injeção de dependência do Nest.
+No caso do SQLite, o provider será a **instância da conexão com o banco**, que você pode injetar em qualquer serviço que precise acessar o banco.
+
+---
+
+## Por que **modularizar**?
+
+- **Organização:** Seu código fica mais limpo e organizado, separando responsabilidades.
+- **Reuso:** Vários serviços podem usar a mesma conexão SQLite sem precisar criar várias conexões.
+- **Manutenção:** Se precisar mudar o banco, só altera o módulo/provider.
+
+---
+
+Quando precisamos criar módulo técnico (infraestrutura) e nao recursos completos (como entidades do domínio, com controller e service)
+podemos utilizar os ocmando diretor:
+nest g module database
+nest g service database
+Isso cria database.module.ts e database.service.ts, que podemos adaptar para lidar com o SQLite.
+
+## Como fazer o provider SQLite e modularizar?
+
+### ✅ 1. Gere o módulo e o serviço
+
+```bash
+nest g module database
+nest g service database
+```
+
+Isso cria:
+
+```
+src/database/database.module.ts
+src/database/database.service.ts
+```
+
+---
+
+### ✅ 2. Configure o serviço para abrir conexão SQLite
+
+📄 `src/database/database.service.ts`
+
+```ts
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Database } from 'sqlite3';
+
+@Injectable()
+export class DatabaseService implements OnModuleInit {
+  private db: Database;
+
+  onModuleInit() {
+    this.db = new Database('./database.sqlite', (err) => {
+      if (err) {
+        console.error('Erro ao conectar no SQLite:', err.message);
+      } else {
+        console.log('✅ Conectado ao SQLite');
+        this.createTable();
+      }
+    });
+  }
+
+  private createTable() {
+    this.db.run(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE
+      )
+    `);
+  }
+
+  get connection(): Database {
+    return this.db;
+  }
+}
+```
+
+---
+
+### ✅ 3. Exporte o serviço no módulo
+
+📄 `src/database/database.module.ts`
+
+```ts
+import { Module } from '@nestjs/common';
+import { DatabaseService } from './database.service';
+
+@Module({
+  providers: [DatabaseService],
+  exports: [DatabaseService],
+})
+export class DatabaseModule {}
+```
+
+### ✅ 4. Injete no `UserService` e use o SQLite
+
+📄 `src/user/user.service.ts`
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { DatabaseService } from '../database/database.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+
+@Injectable()
+export class UserService {
+  constructor(private readonly databaseService: DatabaseService) {}
+
+  private get db() {
+    return this.databaseService.connection;
+  }
+
+  create(createUserDto: CreateUserDto) {
+    const { name, email } = createUserDto;
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        `INSERT INTO users (name, email) VALUES (?, ?)`,
+        [name, email],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ id: this.lastID, name, email });
+        },
+      );
+    });
+  }
+
+  findAll() {
+    return new Promise((resolve, reject) => {
+      this.db.all(`SELECT * FROM users`, [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  }
+
+  findOne(id: number) {
+    return new Promise((resolve, reject) => {
+      this.db.get(`SELECT * FROM users WHERE id = ?`, [id], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+  }
+
+  update(id: number, updateUserDto: UpdateUserDto) {
+    const { name, email } = updateUserDto;
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        `UPDATE users SET name = ?, email = ? WHERE id = ?`,
+        [name, email, id],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ id, name, email });
+        },
+      );
+    });
+  }
+
+  remove(id: number) {
+    return new Promise((resolve, reject) => {
+      this.db.run(`DELETE FROM users WHERE id = ?`, [id], function (err) {
+        if (err) reject(err);
+        else resolve({ deleted: this.changes });
+      });
+    });
+  }
+}
+```
+
+---
+
+### ✅ 5. Importe `DatabaseModule` no `UserModule`
+
+📄 `src/user/user.module.ts`
+
+```ts
+import { Module } from '@nestjs/common';
+import { UserService } from './user.service';
+import { UserController } from './user.controller';
+import { DatabaseModule } from '../database/database.module';
+
+@Module({
+  imports: [DatabaseModule],
+  controllers: [UserController],
+  providers: [UserService],
+})
+export class UserModule {}
+```
+
+---
+
+### ✅ 6. Teste com `curl`
+
+📌 Criar usuário:
+
+```bash
+curl -X POST http://localhost:3000/user \
+  -H "Content-Type: application/json" \
+  -d '{"name": "João", "email": "joao@email.com"}'
+```
+
+O banco de dados está em: database.sqlite
+
+📌 Listar usuários:
+
+```bash
+curl http://localhost:3000/user
+```
+
+---
+
+## 🧠 Conclusão
+
+| Item                        | Feito? | Explicação                                  |
+| --------------------------- | ------ | ------------------------------------------- |
+| `nest g module database`    | ✅     | Criou o módulo para isolar a infraestrutura |
+| `database.service.ts`       | ✅     | Criou e gerenciou conexão com SQLite        |
+| `UserService` usando SQLite | ✅     | Fez as operações CRUD com SQL puro          |
+| Modularização aplicada      | ✅     | Separou responsabilidades corretamente      |
+
+---
+
+Primos passos: fazer testes de integração com essa estrutura, ou como aplicar validações nos DTOs.
+
+# Banco de Dados com ORM:
+
+Banco de dados com ORM (Object-Relational Mapping)
+👉 Você não escreve SQL diretamente.
+👉 Em vez disso, você usa objetos e classes que representam tabelas e registros do banco.
+
+# Savar os dados no banco de dados no banco Mysql com uma orm: TypeORM ou PRISMA
+
+Abaixo os dois tutoriais para sua escolha:
+
+# Savar os dados no banco de dados no banco Mysql com uma orm:TypeORM
+
+Perfeito! Agora vamos transformar o seu código para **salvar os dados no banco de dados MySQL** usando o **TypeORM**, que é a ferramenta oficial suportada pelo NestJS para integração com bancos relacionais.
+
+---
+
+## ✅ Etapas para salvar no MySQL com NestJS
+
+### 🧰 1. Instale o TypeORM e o driver do MySQL
+
+```bash
+npm install @nestjs/typeorm typeorm mysql2
+```
+
+---
+
+### 🛠️ 2. Configure o banco de dados no NestJS
+
+Abra `src/app.module.ts` e configure a conexão com seu banco MySQL:
+
+```ts
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './user/user.module';
+import { User } from './user/entities/user.entity';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'seu_usuario',
+      password: 'sua_senha',
+      database: 'seu_banco',
+      entities: [User],
+      synchronize: true, // cria tabelas automaticamente (use só em dev)
+    }),
+    UserModule,
+  ],
+})
+export class AppModule {}
+```
+
+> Substitua `seu_usuario`, `sua_senha` e `seu_banco` pelos dados reais do seu MySQL.
+
+---
+
+### 🧱 3. Atualize a `User` entity para mapear a tabela
+
+Abra `src/user/entities/user.entity.ts`:
+
+```ts
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+
+  @Column()
+  email: string;
+}
+```
+
+---
+
+### 🧩 4. Atualize `UserModule` para importar o repositório do TypeORM
+
+Em `src/user/user.module.ts`:
+
+```ts
+import { Module } from '@nestjs/common';
+import { UserService } from './user.service';
+import { UserController } from './user.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([User])],
+  controllers: [UserController],
+  providers: [UserService],
+})
+export class UserModule {}
+```
+
+---
+
+### 🧠 5. Atualize `UserService` para usar o banco (MySQL)
+
+Altere `src/user/user.service.ts`:
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+
+@Injectable()
+export class UserService {
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
+
+  create(createUserDto: CreateUserDto) {
+    const user = this.userRepository.create(createUserDto);
+    return this.userRepository.save(user);
+  }
+
+  findAll() {
+    return this.userRepository.find();
+  }
+
+  findOne(id: number) {
+    return this.userRepository.findOneBy({ id });
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    await this.userRepository.update(id, updateUserDto);
+    return this.userRepository.findOneBy({ id });
+  }
+
+  async remove(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (user) {
+      await this.userRepository.remove(user);
+    }
+    return user;
+  }
+}
+```
+
+---
+
+## ✅ Pronto! Agora funciona com o MySQL.
+
+### 🧪 Teste com `curl`
+
+```bash
+curl -X POST http://localhost:3000/user \
+  -H "Content-Type: application/json" \
+  -d '{"name": "João", "email": "joao@email.com"}'
+```
+
+```bash
+curl http://localhost:3000/user
+```
+
+---
+
+## 🧠 Por que isso funciona?
+
+- **TypeORM** mapeia a classe `User` para uma **tabela no banco de dados**.
+- O `UserService` usa `Repository<User>` para criar, buscar, atualizar e deletar usuários.
+- O `synchronize: true` faz com que o Nest crie as tabelas automaticamente com base nas entidades.
+
+---
+
+Se quiser, posso te ajudar a:
+
+- Adicionar validação nos DTOs com `class-validator`
+- Usar migrations (ao invés de `synchronize: true`)
+- Criar relacionamento entre tabelas (ex: `user` e `posts`)
+
+# Savar os dados no banco de dados no banco Mysql com um orm: PRISMA
+
+Perfeito! Vamos usar o **Prisma** com o NestJS para salvar os usuários no **MySQL**. O Prisma é um ORM moderno, com tipagem forte e integração excelente com TypeScript.
+
+---
+
+## ✅ Objetivo:
+
+Fazer o seu CRUD `/user` funcionar com **MySQL e Prisma**.
+
+---
+
+## 📦 1. Instalar o Prisma e o driver MySQL
+
+```bash
+npm install prisma --save-dev
+npm install @prisma/client
+npm install @nestjs/config
+```
+
+---
+
+## ⚙️ 2. Inicializar o Prisma
+
+```bash
+npx prisma init
+```
+
+> Isso vai criar:
+
+```
+prisma/
+  └── schema.prisma
+.env
+```
+
+---
+
+## 🧬 3. Configurar o banco no `.env`
+
+Edite o arquivo `.env`:
+
+```env
+DATABASE_URL="mysql://usuario:senha@localhost:3306/nome_do_banco"
+```
+
+Exemplo:
+
+```env
+DATABASE_URL="mysql://root:root@localhost:3306/nest_prisma"
+```
+
+---
+
+## 📐 4. Criar o modelo `User` no Prisma
+
+Abra `prisma/schema.prisma`:
+
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  name  String
+  email String @unique
+}
+```
+
+---
+
+## 🛠️ 5. Criar as tabelas no MySQL
+
+```bash
+npx prisma db push
+```
+
+> Isso cria a tabela `User` no banco de dados.
+
+---
+
+## 🔧 6. Gerar cliente do Prisma
+
+```bash
+npx prisma generate
+```
+
+---
+
+## 🧩 7. Criar um módulo `PrismaModule` no Nest
+
+```bash
+nest g module prisma
+nest g service prisma
+```
+
+### `src/prisma/prisma.service.ts`:
+
+```ts
+import { Injectable, OnModuleInit, INestApplication } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+
+@Injectable()
+export class PrismaService extends PrismaClient implements OnModuleInit {
+  async onModuleInit() {
+    await this.$connect();
+  }
+
+  async enableShutdownHooks(app: INestApplication) {
+    this.$on('beforeExit', async () => {
+      await app.close();
+    });
+  }
+}
+```
+
+### `src/prisma/prisma.module.ts`:
+
+```ts
+import { Global, Module } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
+
+@Global()
+@Module({
+  providers: [PrismaService],
+  exports: [PrismaService],
+})
+export class PrismaModule {}
+```
+
+---
+
+## 👤 8. Atualizar `UserService` para usar o Prisma
+
+### 1. Primeiro, importe o módulo Prisma:
+
+Em `app.module.ts`:
+
+```ts
+import { PrismaModule } from './prisma/prisma.module';
+
+@Module({
+  imports: [PrismaModule, UserModule],
+})
+export class AppModule {}
+```
+
+---
+
+### 2. Altere `src/user/user.service.ts`:
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+
+@Injectable()
+export class UserService {
+  constructor(private prisma: PrismaService) {}
+
+  create(data: CreateUserDto) {
+    return this.prisma.user.create({ data });
+  }
+
+  findAll() {
+    return this.prisma.user.findMany();
+  }
+
+  findOne(id: number) {
+    return this.prisma.user.findUnique({ where: { id } });
+  }
+
+  update(id: number, data: UpdateUserDto) {
+    return this.prisma.user.update({
+      where: { id },
+      data,
+    });
+  }
+
+  remove(id: number) {
+    return this.prisma.user.delete({ where: { id } });
+  }
+}
+```
+
+---
+
+## 📦 9. Ajustar o DTO
+
+### `create-user.dto.ts`:
+
+```ts
+export class CreateUserDto {
+  name: string;
+  email: string;
+}
+```
+
+---
+
+## ✅ Testar com `curl`
+
+### Criar:
+
+```bash
+curl -X POST http://localhost:3000/user \
+  -H "Content-Type: application/json" \
+  -d '{"name": "João", "email": "joao@email.com"}'
+```
+
+### Listar:
+
+```bash
+curl http://localhost:3000/user
+```
+
+---
+
+## 🧠 Resumo
+
+| Etapa                 | Ferramenta   | Resultado                                       |
+| --------------------- | ------------ | ----------------------------------------------- |
+| ORM                   | Prisma       | Geração de modelo e conexão                     |
+| Banco de dados        | MySQL        | Dados persistem em disco                        |
+| Integração com NestJS | PrismaModule | Prisma injetado com DI (Injeção de Dependência) |
+| Controle de acesso    | DTOs         | Define e valida os dados de entrada             |
+
+---
+
+Proximos passos: mostrar como adicionar validações com `class-validator` ou como gerar migrations com o Prisma. Deseja seguir com isso?
+
+# Conhecimento
+
+## 🧠 O que é um **banco de dados com e sem ORM**?
+
+### ✅ **Banco de dados com ORM (Object-Relational Mapping)**
+
+👉 Você **não escreve SQL** diretamente.
+👉 Em vez disso, você usa **objetos e classes** que representam tabelas e registros do banco.
+
+### Exemplo (com ORM):
+
+```ts
+const user = await userRepository.findOne({ where: { id: 1 } });
+```
+
+> Aqui você usa **métodos de um objeto**, não escreve `SELECT * FROM users`.
+
+#### Ferramentas ORM populares:
+
+- **TypeORM** (NestJS, Node.js)
+- **Prisma** (moderno e tipado)
+- **Hibernate** (Java)
+- **Entity Framework** (C#)
+
+---
+
+### 🚫 **Banco de dados sem ORM**
+
+👉 Você escreve **SQL puro** (manualmente).
+👉 Você tem mais controle, mas precisa lidar com **queries, conexões e erros** por conta própria.
+
+### Exemplo (sem ORM):
+
+```ts
+db.get('SELECT * FROM users WHERE id = ?', [1], (err, row) => {
+  console.log(row);
+});
+```
+
+> Aqui você escreve a SQL completa e trata o retorno manualmente.
+
+---
+
+## 🆚 Diferença simples:
+
+| Aspecto              | Com ORM                                   | Sem ORM                          |
+| -------------------- | ----------------------------------------- | -------------------------------- |
+| Linguagem            | Classe e métodos (`.find()`)              | SQL puro (`SELECT ...`)          |
+| Curva de aprendizado | Mais fácil para iniciantes                | Mais controle, mais complexidade |
+| Produtividade        | Alta (menos código manual)                | Média/baixa (mais código)        |
+| Performance          | Boa (com tuning), mas pode esconder o SQL | Máxima transparência             |
+| Erros                | Tratados por abstração                    | Você trata tudo                  |
+
+---
+
+## 🧪 Quando usar qual?
+
+- ✅ **Use ORM** se você quer **rapidez para desenvolver**, foco em regras de negócio e produtividade.
+- ✅ **Use sem ORM** se você quer **total controle**, simplicidade ou está em projeto pequeno.
+
+---
