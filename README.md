@@ -103,6 +103,30 @@ Antes de começar, você precisa ter instalado:
 
 ---
 
+# Projeto de Sofwtare com Engenharia:
+
+## Diagrama Arquitetural
+
+![Texto alternativo](./doc/Arquitetura//DiagramaArquitetural.png)
+
+# Módulo Usuário:
+
+## Diagrama de Atividade - Registrar usuário
+
+![Texto alternativo](./doc/ModuleUser/diagramaAtividadeUser.png)
+
+## Diagrama de Sequência - Registrar usuário
+
+![Texto alternativo](./doc/ModuleUser/diagramaSequencia.png)
+
+## Diagrama de Classe
+
+![Texto alternativo](./doc/ModuleUser/DiagramadeClasse.png)
+
+# Módulo Database:
+
+![Texto alternativo](./doc/ModuleDatabase/DiagramaEntidadeRelacionamento.png)
+
 ## 🚀 Criando o Projeto
 
 1. **Abra o terminal no VS Code** ou terminal do sistema.
