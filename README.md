@@ -70,7 +70,161 @@ npm run start:dev
 
 ---
 
-Comecçando o projeto do zero:
+# Projeto de Sofwtare com Engenharia:
+
+## Arquitetura em camadas (Layered Architecture): Arquitetura em camadas modularizada
+
+O NestJS adota nativamente uma arquitetura em camadas modularizada, inspirada no padrão Clean Architecture (ou Onion, Hexagonal), com forte influência de DDD (Domain-Driven Design).
+
+Arquitetura adotada:
+
+Arquitetura padrão do NestJS geralmente possui 3 camadas principais (Controller,Service,Entity), mas o número pode variar conforme a complexidade do projeto.
+Inclui neste projeto a camada de apresentação e a camada database, ficando assim uma arquitetura de 5 camadas, também chamada de N camadas.
+
+<img src="./doc/Arquitetura/layerNestjs.png" alt="Texto alternativo" width="200"/>
+
+Camadas (Layered Architecture) com separação clara entre:
+
+1. Interface de Usuário (Frontend): Representa a interface que o usuário interage (HTML + JS).
+2. Interface de Entrada / Apresentação (Controller): Camada de Controllers no NestJS.Responsável por receber requisições HTTP e chamar os serviços.
+3. Aplicação / Serviço (Service):Onde ficam as regras de negócio específicas da aplicação
+4. Domínio (Entidades): Regras centrais do negócio e modelo de dados
+5. Infraestrutura (Database): Contém o acesso a banco de dados, integrações, APIs externas etc.
+
+O arquivo user.entity.ts representa a entidade de domínio, ou seja, a forma central como seu sistema entende um "usuário". A presença dele mostra que você está se aproximando de Clean Architecture, DDD ou Onion Architecture.
+
+O projeto NestJs segue uma arquitetura em camadas, inspirada na Clean Architecture:
+
+- Controller: Interface de entrada, recebe e repassa dados.
+- Service: Contém regras de negócio específicas da aplicação.
+- Entities: Representam o modelo de domínio
+- DTOs: contratos de entrada.
+- DatabaseService: Responsável pela persistência (infraestrutura).
+
+  Essa organização facilita o desacoplamento, modularidade e testes.
+
+![Texto alternativo](./doc/Arquitetura/DiagramaEmCamadas.png)
+
+Nesta imagem não foi representada a camada do Frotend (Interface de Usuário)
+
+## Diagrama Arquitetural
+
+O Diagrama Arquitetural serve para representar visualmente a estrutura de um sistema de software, mostrando como seus componentes principais se organizam, interagem e se comunicam entre si.
+
+![Texto alternativo](./doc/Arquitetura/DiagramaArquitetural.png)
+
+# Módulo Usuário:
+
+## Diagrama de Caso de Uso
+
+O Diagrama de Caso de Uso serve para mostrar as funcionalidades do sistema e como os usuários (atores) interagem com ele
+
+## Diagrama de Caso de uso - Cenário de caso de uso do Registrar usuário
+
+Detalhar passo a passo as interações entre o usuário e o sistema durante o processo de cadastro, mostrando as ações e respostas envolvidas.
+
+### O que o sistema faz - Perspectiva - Externa (usuário/sistema)
+
+![Texto alternativo](./doc/ModuleUser/diagramaCasodeUsoUser.png)
+Descreve um cenário que mostra as funcionalidades do sistema do ponto de vista do usuário
+
+## Diagrama de Atividade
+
+O Diagrama de Atividade serve para representar visualmente o fluxo de execução de um processo ou funcionalidade, mostrando as etapas, decisões, e caminhos alternativos que podem ocorrer.
+
+## Diagrama de Atividade - Registrar usuário
+
+Descrevendo todas as etapas que ocorrem no fluxo de cadastro de um usuário
+
+### Como o processo acontece (passo a passo) - Perspectiva Comportamental de processos - Interna (fluxo de controle)
+
+![Texto alternativo](./doc/ModuleUser/diagramaAtividadeUser.png)
+
+O diagrama de atividades mostra o fluxo de controle e dados de uma atividade para outra.
+Mostrar o fluxo de atividades (comportamento) em um processo
+
+## Diagrama de Sequência
+
+O Diagrama de Sequência é um tipo de diagrama da UML (Linguagem de Modelagem Unificada) usado para modelar o comportamento dinâmico de um sistema, mostrando como os objetos interagem entre si ao longo do tempo para realizar uma tarefa ou processo.
+
+## Diagrama de Sequência - Registrar usuário
+
+### Quem chama quem, em que ordem
+
+O Diagrama de Sequência mostra como os objetos interagem entre si ao longo do tempo, destacando a ordem das mensagens trocadas durante um processo (caso de uso, por exemplo).
+
+Interações entre objetos/sistemas
+![Texto alternativo](./doc/ModuleUser/diagramaSequencia.png)
+
+## Diagrama de Classe
+
+O Diagrama de Classes serve para representar a estrutura estática do sistema, mostrando suas classes, atributos, métodos e os relacionamentos entre elas.
+
+![Texto alternativo](./doc/ModuleUser/DiagramadeClasse.png)
+
+# Módulo Database:
+
+## Diagrama de Entidade Relacionamento (DER)
+
+O Diagrama de Entidade-Relacionamento (DER) serve para representar graficamente a estrutura de um banco de dados, mostrando entidades, atributos e seus relacionamentos de forma clara e organizada.
+
+![Texto alternativo](./doc/ModuleDatabase/DiagramaEntidadeRelacionamento.png)
+
+# Padrão de projeto:
+
+### 🔧 **Padrão Service Layer (Camada de Serviço)**
+
+Organiza a lógica de negócio em **classes de serviço**, separando-a da camada de controle (Controller).
+
+- Cada classe (ex: `UserService`) agrupa métodos relacionados à **mesma entidade**.
+- Facilita reutilização, testes e manutenção do código.
+  ✅ Exemplo: `UserService` cuida de criar, listar, atualizar e remover usuários.
+
+```ts
+export class UserService {
+          contructor...
+
+          create(createUserDto: CreateUserDto) {
+          ...
+          }
+
+          findAll() {
+          ...
+          }
+
+          findOne(id: number) {
+          ...
+          }
+
+          update(id: number, updateUserDto: UpdateUserDto) {
+          ...
+          }
+
+          remove(id: number) {
+          ...
+          }
+}
+```
+
+Centraliza a lógica de negócio em uma única classe de serviço.
+
+---
+
+### 📦 **Padrão DTO (Data Transfer Object)**
+
+Define **objetos usados para transferir dados** entre camadas (Controller → Service).
+
+- Garante que apenas os dados necessários sejam passados.
+- Ajuda na validação e clareza da entrada de dados.
+  ✅ Exemplo: `CreateUserDto` define que só `name` e `email` devem ser enviados ao criar um usuário.
+
+---
+
+Esses dois padrões ajudam a manter o código **modular, organizado e fácil de escalar**.
+
+# 🚀 Criando o Projeto do Zero
+
+Vamos agora iniciar um projeto do zero para conhecermos o NestJs e seu poder...
 
 # Tutorial passo a passo do Projeto: API com Frontend e Backend em NestJS
 
@@ -102,83 +256,6 @@ Antes de começar, você precisa ter instalado:
    👉 [https://code.visualstudio.com/](https://code.visualstudio.com/)
 
 ---
-
-# Projeto de Sofwtare com Engenharia:
-
-## Arquitetura em camadas (Layered Architecture): Arquitetura em camadas modularizada
-
-O NestJS adota nativamente uma arquitetura em camadas modularizada, inspirada no padrão Clean Architecture (ou Onion, Hexagonal), com forte influência de DDD (Domain-Driven Design).
-
-Arquitetura adotada:
-
-Arquitetura padrão do NestJS geralmente possui 4 camadas principais, mas o número pode variar conforme a complexidade do projeto.
-Inclui neste projeto a camada de apresentação, ficando assim uma arquitetura de 5 camadas, também chamada de N camadas.
-
-<img src="./doc/Arquitetura/layerNestjs.png" alt="Texto alternativo" width="200"/>
-
-Camadas (Layered Architecture) com separação clara entre:
-
-1. Interface de Usuário (Frontend): Representa a interface que o usuário interage (HTML + JS).
-2. Interface de Entrada / Apresentação (Controller): Camada de Controllers no NestJS.Responsável por receber requisições HTTP e chamar os serviços.
-3. Aplicação / Serviço (Service):Onde ficam as regras de negócio específicas da aplicação
-4. Domínio (Entidades): Regras centrais do negócio e modelo de dados
-5. Infraestrutura (Database): Contém o acesso a banco de dados, integrações, APIs externas etc.
-
-O arquivo user.entity.ts representa a entidade de domínio, ou seja, a forma central como seu sistema entende um "usuário". A presença dele mostra que você está se aproximando de Clean Architecture, DDD ou Onion Architecture.
-
-O projeto segue uma arquitetura em camadas, inspirada na Clean Architecture:
-
-- Controller: Interface de entrada, recebe e repassa dados.
-- Service: Contém regras de negócio específicas da aplicação.
-- Entities: Representam o modelo de domínio
-- DTOs: contratos de entrada.
-- DatabaseService: Responsável pela persistência (infraestrutura).
-
-  Essa organização facilita o desacoplamento, modularidade e testes.
-
-![Texto alternativo](./doc/Arquitetura/DiagramaEmCamadas.png)
-
-## Diagrama Arquitetural
-
-O Diagrama Arquitetural serve para representar visualmente a estrutura de um sistema de software, mostrando como seus componentes principais se organizam, interagem e se comunicam entre si.
-
-![Texto alternativo](./doc/Arquitetura/DiagramaArquitetural.png)
-
-# Módulo Usuário:
-
-## Diagrama de Atividade
-
-O Diagrama de Atividade serve para representar visualmente o fluxo de execução de um processo ou funcionalidade, mostrando as etapas, decisões, e caminhos alternativos que podem ocorrer.
-
-## Diagrama de Atividade - Registrar usuário
-
-Descrevendo todas as etapas que ocorrem no fluxo de cadastro de um usuário
-
-![Texto alternativo](./doc/ModuleUser/diagramaAtividadeUser.png)
-
-## Diagrama de Sequência
-
-O Diagrama de Sequência é um tipo de diagrama da UML (Linguagem de Modelagem Unificada) usado para modelar o comportamento dinâmico de um sistema, mostrando como os objetos interagem entre si ao longo do tempo para realizar uma tarefa ou processo.
-
-## Diagrama de Sequência - Registrar usuário
-
-Diagrama mostra o passo a passo do processo de cadastro de um usuário no sistema
-
-![Texto alternativo](./doc/ModuleUser/diagramaSequencia.png)
-
-## Diagrama de Classe
-
-O Diagrama de Classes serve para representar a estrutura estática do sistema, mostrando suas classes, atributos, métodos e os relacionamentos entre elas.
-
-![Texto alternativo](./doc/ModuleUser/DiagramadeClasse.png)
-
-# Módulo Database:
-
-![Texto alternativo](./doc/ModuleDatabase/DiagramaEntidadeRelacionamento.png)
-
-## 🚀 Criando o Projeto do Zero
-
-Vamos agora iniciar um projeto do zero para conhecermos o NestJs e seu poder...
 
 1. **Abra o terminal no VS Code** ou terminal do sistema.
 
