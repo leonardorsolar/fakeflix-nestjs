@@ -49,3 +49,36 @@ SQLite --> "database.service.ts" : resposta
 "user.service.ts" --> "user.controller.ts"
 "user.controller.ts" --> "script.js" : HTTP 201
 @enduml
+
+# Diagrama das Camadas:
+
+@startuml
+skinparam componentStyle rectangle
+
+package "Interface de Entrada\n(Presentation)" {
+[UserController]
+}
+
+package "Camada de Aplicação\n(Application)" {
+[UserService]
+}
+
+package "Camada de Domínio\n(Domain)" {
+[CreateUserDto]
+[UpdateUserDto]
+[UserEntity]
+}
+
+package "Infraestrutura\n(Infrastructure)" {
+[DatabaseService]
+[SQLite]
+}
+
+UserController --> UserService
+UserService --> CreateUserDto
+UserService --> UpdateUserDto
+UserService --> UserEntity
+UserService --> DatabaseService
+DatabaseService --> SQLite
+
+@enduml
