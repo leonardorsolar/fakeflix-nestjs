@@ -9,7 +9,7 @@ A proposta é desenvolver uma **API RESTful** com NestJS e integrar com um **fro
 ### 🧰 Tecnologias utilizadas
 
 - **NestJS** (backend)
-- **SQLite** (banco de dados local simples, sem ORM)
+- **SQLite** (banco de dados com sqlte, sem ORM)
 - **HTML/CSS/JavaScript** (frontend estático)
 - **Node.js** e **npm**
 
@@ -36,9 +36,7 @@ Este projeto serve como base para aprender conceitos fundamentais como:
 
 ---
 
-Perfeito! Abaixo está o trecho que você pode **incluir no seu `README.md`** para orientar a pessoa a **baixar o projeto via GitHub** e executar localmente:
-
----
+Para instalar as dependências e subir o servidor, segue:
 
 ### 📥 Clonando o projeto via GitHub
 
@@ -50,6 +48,9 @@ git clone https://github.com/seu-usuario/seu-repositorio.git
 
 # Acesse a pasta do projeto
 cd seu-repositorio
+
+# Instale o Nest de forma global
+npm i -g @nestjs/cli
 
 # Instale as dependências
 npm install
@@ -69,7 +70,9 @@ npm run start:dev
 
 ---
 
-# Tutorial passo a passo doProjeto: API com Frontend e Backend em NestJS
+Comecçando o projeto do zero:
+
+# Tutorial passo a passo do Projeto: API com Frontend e Backend em NestJS
 
 ---
 
