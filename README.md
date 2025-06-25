@@ -131,7 +131,7 @@ O projeto NestJs segue uma arquitetura em camadas, inspirada na Clean Architectu
 
 ![Texto alternativo](./doc/Arquitetura/DiagramaEmCamadas.png)
 
-Nesta imagem não foi representada a camada do Frotend (Interface de Usuário)
+Nesta imagem não foi representada a camada do Frontend (Interface de Usuário)
 
 ## Diagrama Arquitetural
 
@@ -856,7 +856,9 @@ Esse teste:
 
 # Começando no Nestjs
 
-Ótimo! Vamos criar um **projeto NestJS básico** com uma rota `/user` que:
+### Criando um Módulo no NestJs: Módulo USER
+
+Ótimo! Vamos criar um módulo dentro do **projeto NestJS básico** com uma rota `/user` que:
 
 - Aceita requisições `POST` com dados de um usuário (via `curl`)
 - Salva os usuários em memória (temporariamente)
@@ -1065,6 +1067,42 @@ As respostas do servidor serão objetos JSON como:
   "email": "joao@email.com"
 }
 ```
+
+## Visualizando o arquivo src/app.module.ts
+
+# app.module.ts
+
+O app.module.ts é o coração da aplicação NestJS — ele junta tudo o que o sistema vai usar.
+
+Esse código define o **módulo principal** da aplicação NestJS, chamado `AppModule`.
+
+### 📦 Código completo
+
+```ts
+import { Module } from '@nestjs/common';
+import { UserModule } from './user/user.module';
+import { DatabaseModule } from './database/database.module';
+
+@Module({
+  imports: [UserModule, DatabaseModule],
+  controllers: [],
+  providers: [],
+})
+export class AppModule {}
+```
+
+Esse código diz:
+"Estou montando a aplicação"
+"Quero usar o módulo de usuários (UserModule)"
+"E também o módulo de banco de dados (DatabaseModule)"
+
+O AppModule é o módulo principal do NestJS.
+Ele importa os outros módulos do sistema para que tudo funcione junto.
+Neste exemplo, ele usa:
+
+UserModule: cuida dos usuários
+
+DatabaseModule: cuida do banco de dados
 
 ---
 
