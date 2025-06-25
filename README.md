@@ -72,6 +72,32 @@ npm run start:dev
 
 # Projeto de Sofwtare com Engenharia:
 
+# Especificação de requisitos
+
+### 1. **Requisitos Funcionais (RF)**
+
+| Código | Descrição                                                               |
+| ------ | ----------------------------------------------------------------------- |
+| RF01   | O sistema deve permitir cadastrar um novo usuário com nome e e-mail.    |
+| RF02   | O sistema deve listar todos os usuários cadastrados.                    |
+| RF03   | O sistema deve retornar os dados de um usuário específico, dado seu ID. |
+| RF04   | O sistema deve permitir a atualização do nome e e-mail de um usuário.   |
+| RF05   | O sistema deve permitir a exclusão de um usuário.                       |
+
+---
+
+### 2. **Requisitos Não Funcionais (RNF)**
+
+| Código | Descrição                                                                |
+| ------ | ------------------------------------------------------------------------ |
+| RNF01  | A aplicação deve ser construída usando NestJS e TypeScript.              |
+| RNF02  | O banco de dados utilizado será SQLite.                                  |
+| RNF03  | O sistema deve seguir o padrão REST.                                     |
+| RNF04  | As respostas da API devem estar no formato JSON.                         |
+| RNF05  | O tempo de resposta para cada requisição deve ser inferior a 2 segundos. |
+
+---
+
 ## Arquitetura em camadas (Layered Architecture): Arquitetura em camadas modularizada
 
 O NestJS adota nativamente uma arquitetura em camadas modularizada, inspirada no padrão Clean Architecture (ou Onion, Hexagonal), com forte influência de DDD (Domain-Driven Design).
