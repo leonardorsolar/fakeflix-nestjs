@@ -39,27 +39,25 @@ Este projeto serve como base para aprender conceitos fundamentais como:
 ### 🚀 Tutoriais
 
 **user-nestjs-1-1**
-
-- Tutorial para inciar no nest e criar o módulo user com banco de dados
+- Tutorial que se encontra neste arquivo para inciar no nest e criar o módulo user com banco de dados
 - Arquitetura mvc
-- Acesse ao tutorial atual : [https://github.com/leonardorsolar/user-nestjs-1-1](https://github.com/leonardorsolar/user-nestjs-1-1)
-- 
+
   **user-nestjs-best-practices-1-2**
 - Tutorial para refatorar o código seguindo boas padrões
 - Mudança da arquitetura MVC para 3 camadas criando o repository
-- Acesse ao tutorial atual : [https://github.com/leonardorsolar/user-nestjs-best-practices-1-2](https://github.com/leonardorsolar/user-nestjs-best-practices-1-2)
+- Acesse ao tutorial : [https://github.com/leonardorsolar/user-nestjs-best-practices-1-2](https://github.com/leonardorsolar/user-nestjs-best-practices-1-2)
 - 
   **user-nestjs-best-practices-1-3**
 - Tutorial para aprender sobre validações e tratamento de erros
-- Acesse ao tutorial atual : [https://github.com/leonardorsolar/user-nestjs-best-practices-1-3](https://github.com/leonardorsolar/user-nestjs-best-practices-1-3)
+- Acesse ao tutorial : [https://github.com/leonardorsolar/user-nestjs-best-practices-1-3](https://github.com/leonardorsolar/user-nestjs-best-practices-1-3)
 - 
   **user-nestjs-best-practices-1-4**
 - Tutorial para testar a aplicação de froma automatizada
-- Acesse ao tutorial atual : [https://github.com/leonardorsolar/user-nestjs-best-practices-1-4](https://github.com/leonardorsolar/user-nestjs-best-practices-1-4)
+- Acesse ao tutorial : [https://github.com/leonardorsolar/user-nestjs-best-practices-1-4](https://github.com/leonardorsolar/user-nestjs-best-practices-1-4)
 - 
   **user-nestjs-best-practices-1-5**
 - Tutorial para aprender a adcionar um ORM Prisma para projeto.
-- Acesse ao tutorial atual : [https://github.com/leonardorsolar/user-nestjs-best-practices-1-5](https://github.com/leonardorsolar/user-nestjs-best-practices-1-5)
+- Acesse ao tutorial : [https://github.com/leonardorsolar/user-nestjs-best-practices-1-5](https://github.com/leonardorsolar/user-nestjs-best-practices-1-5)
 
 ---
 
